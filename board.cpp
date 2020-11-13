@@ -1,9 +1,15 @@
 /*************************************/
-/* A Hex program using openGL & C++  */
+/* A Simple Hex Board Game           */
 /*************************************/
 
-// this code just creates a window and draws three rectangles in it
-
+/* 
+ *
+ * this code just creates a window,
+ * draws a hex board and allows
+ * two players red and blue
+ * to place stones on the board
+ *
+*/
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include <cstdlib>
@@ -15,37 +21,47 @@
 #include <memory>
 #include <GL/freeglut.h>
 
-
+#include "Hex.h"
+#include <vector>
 
 using namespace std;
 
-int x, y;
-bool check;
 int turn = 1;
+std::vector<Hexagon*>board;     //holds a hundred hexagons
+
+void initializeBoard(){
+    double xstart = 200;
+    double ystart = 20;
+    for(int i=0; i<10; i++){
+        double pos_y = ystart+(20*i);
+        double pos_x = xstart-(20*i);
+        for(int j=0; j<i+1; j++){
+            board.push_back(new Hexagon(pos_x, pos_y, 0));
+            pos_x += 40;
+        }
+    }
+
+    // second half of the board
+    int nth = 0;
+    xstart = 40;
+    ystart = 220;
+    for(int i=9; i>0; i--){
+        double pos_y = ystart+(20*nth);
+        double pos_x = xstart+(20*nth);
+        for(int j=0; j<i; j++){
+            board.push_back(new Hexagon(pos_x, pos_y, 0));
+            pos_x += 40;
+        }
+        nth++;
+    }
+}
+
 
 /*
-// set up projection
-void init(){
-    glClearColor(0.0, 0.0, 0.0, 0.0); // clear -> black R,G,B,A = 0 (A=alpha channel)
-    glMatrixMode(GL_PROJECTION);      // applies subsequent matrix ops to
-                                    // projection matrix
-    glLoadIdentity();
-    //gluOrtho2D(0.0, 800.0, 0.0, 800.0); // view box
-    glOrtho(-50.0, 50.0, -50.0, 50.0, -1.0, 1.0);
-    glMatrixMode(GL_MODELVIEW);
-
-    // all matrix operations that follow apply to modelview matrix
-}*/
-
-
-/*
-    Utility function to draw the circle
+ * Draw the blue circle
 */
-void DrawCircle1(float cx, float cy, float r, int num_segments) 
-{   
-    glColor3f(0.0, 1.0, 0.0);
-    turn = 2;
-   
+void DrawCircle1(float cx, float cy, float r, int num_segments) {   
+    glColor3f(0.0, 0.0, 1.0);   
     glBegin(GL_LINE_LOOP);
     for (int i = 0; i < num_segments; i++)   
     {
@@ -57,13 +73,11 @@ void DrawCircle1(float cx, float cy, float r, int num_segments)
     glEnd();
 }
 
-void DrawCircle2(float cx, float cy, float r, int num_segments) 
-{   
-   
-    
-    glColor3f(0.0, 0.0, 1.0);
-    turn = 1;
-    
+/*
+ * Draws red stone
+*/
+void DrawCircle2(float cx, float cy, float r, int num_segments) {   
+    glColor3f(1.0, 0.0, 0.0);    
     glBegin(GL_LINE_LOOP);
     for (int i = 0; i < num_segments; i++)   
     {
@@ -73,18 +87,28 @@ void DrawCircle2(float cx, float cy, float r, int num_segments)
         glVertex2f(x + cx, y + cy);//output vertex 
     }
     glEnd();
+}
+
+/*
+ * Fills the position with the 
+ * respective stone blue/red
+*/
+void Draw(){
+    for(int i=0; i<100; i++){
+        if(board[i]->turn == 1){
+            DrawCircle1(board[i]->x, board[i]->y, 10, 15);
+        }
+        else if(board[i]->turn == 2){
+            DrawCircle2(board[i]->x, board[i]->y, 10, 15);
+        }
+    }
 }
 
 // display content (called automatically in main loop)
 void display(){
-    //glClear(GL_COLOR_BUFFER_BIT);
-    //glColor3f(1.0, 1.0, 1.0);
-    //glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
-    //glClear(GL_COLOR_BUFFER_BIT);       // clear color buffer
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glColor3f(1.0, 0.0, 0.0);
-
-
+    
+    glColor3f(0.0, 0.0, 0.0);
     double start_x = 0.0;
     double start_y = 0.0;
     for(int i=10; i>0; i--){
@@ -100,7 +124,6 @@ void display(){
         if(i==1 ){ start_x = 200.0; start_y = 365;}
 
         double increment_x = 0;
-        double increment_y = 0;
         for(int j=0; j<i; j++){
             glBegin(GL_POLYGON); 
             glVertex3f(start_x-0+increment_x, start_y, 0.0);
@@ -110,7 +133,6 @@ void display(){
             glVertex3f(start_x+20+increment_x, start_y+20, 0.0);
             glVertex3f(start_x+20+increment_x, start_y+10, 0.0);
             increment_x += 40;
-            
             glEnd();
         }
     } 
@@ -128,7 +150,6 @@ void display(){
         if(i==1 ){ start_x = 200.0; start_y = 05;}
 
         double increment_x = 0;
-        double increment_y = 0;
         for(int j=0; j<i; j++){
             glBegin(GL_POLYGON); 
             glVertex3f(start_x-0+increment_x, start_y, 0.0);
@@ -138,33 +159,34 @@ void display(){
             glVertex3f(start_x+20+increment_x, start_y+20, 0.0);
             glVertex3f(start_x+20+increment_x, start_y+10, 0.0);
             increment_x += 40;
-            
             glEnd();
         }
     } 
-
-
-    if(check){
-        if(turn == 1){
-            DrawCircle1(x, y, 10, 15);
-        }
-        else if (turn == 2){
-            DrawCircle2(x,y, 10, 15);
-        }
-    }
+    // fill board with a stones if theres a click
+    Draw();
+    
     glFlush();
     glutSwapBuffers();             // bring draw buffer to front
 }
 
 // Mouse click
 void onMouse(int button, int state, int mousex, int mousey){
-    
     if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-        check = true;
-        x = mousex;
-        y = mousey;
+        for(int i=0; i<100; i++){
+            if(fabs(board[i]->x - mousex)<=20 && fabs(board[i]->y - mousey) <=15){
+                if(board[i]->turn == 0){
+                    board[i]->turn = turn;
+                    if(turn == 1){
+                        turn = 2;
+                    }
+                    else if(turn ==2){
+                        turn =1;
+                    }
+                }
+                break;
+            }
+        }
         cout << "left clicked down\n";
-        
     }
     glutPostRedisplay();
 }
@@ -184,15 +206,16 @@ void Reshape(int x, int y)
 
 
 int main (int argc, char **argv){
-    //LoadMap("map.bmp");
     // setup window
+    initializeBoard();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB); // double buffering, rbg mode
     glutInitWindowSize(400, 400);
     glutInitWindowPosition(0, 0);
-    glutCreateWindow("Hex Board");
+    glutCreateWindow("10X10 Hex Board Game");
+    glClearColor(0.6f, 0.8f, 0.7f, 0.7f);
+    glClear(GL_COLOR_BUFFER_BIT);       // clear color buffer
     glutMouseFunc(onMouse);
-    //init();
 
     // register call-back function
     glutReshapeFunc(Reshape);
