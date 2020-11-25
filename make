@@ -1,0 +1,1 @@
+g++ -g -Wall -Wextra -std=c++17 -O board.cpp -lglut -lGL -lGLU -lGLEW
