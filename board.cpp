@@ -106,6 +106,42 @@ void Draw(){
 
 // display content (called automatically in main loop)
 void display(){
+    glColor3f(0.0, 0.0, 1.0);
+    glRasterPos2f(70, 60);
+    string blue1 = "BLUE";
+    int i=0;
+    while(blue1[i] != '\0'){
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, blue1[i]);
+        i++;
+    }
+    
+    glColor3f(0.0, 0.0, 1.0);
+    glRasterPos2f(280, 350);
+    string blue2 = "BLUE";
+    i=0;
+    while(blue2[i] != '\0'){
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, blue2[i]);
+        i++;
+    }
+
+    glColor3f(1.0, 0.0, 0.0);
+    glRasterPos2f(70, 350);
+    string red1 = "RED";
+    i=0;
+    while(red1[i] != '\0'){
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, red1[i]);
+        i++;
+    }
+
+    glColor3f(1.0, 0.0, 0.0);
+    glRasterPos2f(280, 60);
+    string red2 = "RED";
+    i=0;
+    while(red2[i] != '\0'){
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, red2[i]);
+        i++;
+    }
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     glColor3f(0.0, 0.0, 0.0);
@@ -186,7 +222,6 @@ void onMouse(int button, int state, int mousex, int mousey){
                 break;
             }
         }
-        cout << "left clicked down\n";
     }
     glutPostRedisplay();
 }
